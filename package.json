@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^6.2.0",
+    "ckeditor5-custom-build": "file:ckeditor5",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
     "react": "^18",
