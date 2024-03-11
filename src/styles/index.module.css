@@ -1,0 +1,19 @@
+.header{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  border-bottom: 1px solid black;
+  height: fit-content;
+  padding: 1rem 0rem;
+}
+
+.pages{
+  width: fit-content;
+  font-size: 30px;
+}
+
+.pages:hover{
+  cursor: pointer;
+  color: #555555;
+}
