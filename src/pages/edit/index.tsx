@@ -38,6 +38,9 @@ function Index() {
   const { data: names, error: namesError } = useSWR<NamesData>("/api/getNames", fetcher);
 
   function save() {
+    if(page){
+      page.content = pageContent;
+    }
     fetch("/api/setPage", {
       method: "POST",
       headers: {
