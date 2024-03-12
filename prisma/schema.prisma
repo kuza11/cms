@@ -20,9 +20,9 @@ model Admin {
 }
 
 model Pages {
-  id      Int      @id
+  id      Int      @id @default(autoincrement())
   pageNum Int
   name    String
-  content String   @db.Text
+  content String   @db.LongText
   date    DateTime @default(now())
 }

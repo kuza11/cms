@@ -49,31 +49,24 @@ const editorConfiguration2 = {
 function CustomEditor(props) {
   return (
     <div>
-    <CKEditor
-      editor={Editor}
-      data={props.initialData}
-      config={editorConfiguration2}
-      onChange={(event, editor) => {
-        const data = editor.getData();
-        //console.log({ event, editor, data });
-      }}
-      onReady={(editor) => {
-        //console.log("Editor is ready to use!", editor.ui.getEditableElement());
+      <CKEditor
+        editor={Editor}
+        data={props.initialData}
+        config={editorConfiguration2}
+        onChange={props.onChange}
+        onReady={(editor) => {
+          //console.log("Editor is ready to use!", editor.ui.getEditableElement());
 
-        // Insert the toolbar before the editable area.
-        if(editor.ui.getEditableElement()){
-          editor.ui
-            .getEditableElement()
-            .parentElement.insertBefore(
-              editor.ui.view.toolbar.element,
-              editor.ui.getEditableElement()
-            );
-        }
+          // Insert the toolbar before the editable area.
+          if (editor.ui.getEditableElement()) {
+            editor.ui
+              .getEditableElement()
+              .parentElement.insertBefore(editor.ui.view.toolbar.element, editor.ui.getEditableElement());
+          }
 
-
-        //this.editor = editor;
-      }}
-    />
+          //this.editor = editor;
+        }}
+      />
     </div>
   );
 }
