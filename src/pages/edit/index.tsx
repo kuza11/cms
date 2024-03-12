@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { RefAttributes, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { PageData } from "../api/getPage";
@@ -7,9 +7,12 @@ import { useState } from "react";
 import Editor from "ckeditor5-custom-build";
 import styles from "../../styles/index.module.css";
 
+import api from "../../../api.json";
+
 const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
 
-const CustomEditor: React.ComponentType<CustomEditorProps> = dynamic(
+
+const CustomEditor = dynamic(
   () => {
     return import("../../components/custom-editor");
   },
@@ -21,11 +24,14 @@ interface CustomEditorProps {
   initialData?: string;
 }
 
+interface CustomEditorRef {
+  setContent: (content: string) => void;
+}
+
 function Index() {
   const [id, setid] = useState(1);
   const [pageContent, setPageContent] = useState("");
-  const [savePage, setSavePage] = useState(false);
-
+  const editorRef = useRef<CustomEditorRef>(null);
 
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?id=${id}`, fetcher);
 
@@ -33,11 +39,7 @@ function Index() {
 
   const { data: names, error: namesError } = useSWR<NamesData>("/api/getNames", fetcher);
 
-
-
-
   function save() {
-    console.log(pageContent);
     fetch("/api/setPage", {
       method: "POST",
       headers: {
@@ -46,8 +48,16 @@ function Index() {
       body: JSON.stringify({
         id: id,
         content: pageContent,
+        key: api.key,
       }),
-    })
+    });
+  }
+
+  function cancel() {
+    console.log(editorRef.current);
+    if (editorRef.current) {
+      editorRef.current.setContent(page?.content || "");
+    }
   }
 
   return (
@@ -73,15 +83,20 @@ function Index() {
         <p>Failed to load page</p>
       ) : page ? (
         <>
-        <div className={styles.cke}>
-          <CustomEditor
-            onChange={(event, editor) => {
-              setPageContent(editor.getData());
-            }}
-            initialData={page?.content}
-          />
-        </div>
-        <button onClick={save}>Save</button>
+          <div className={styles.cke}>
+            <CustomEditor
+              ref={editorRef}
+              onChange={(event, editor) => {
+                setPageContent(editor.getData());
+              }}
+              initialData={page?.content}
+              
+            />
+          </div>
+          <div className={styles.buttons}>
+          <button onClick={cancel}>Cancel</button>
+          <button onClick={save}>Save</button>
+          </div>
         </>
       ) : (
         "Loading..."

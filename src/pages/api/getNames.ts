@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/server/db";
 
 export interface NamesData extends Array<{ name: string, id: number, pageNum: number }> {};
 

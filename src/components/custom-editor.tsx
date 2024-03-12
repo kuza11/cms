@@ -1,7 +1,6 @@
-import React from "react";
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
-import { useEffect } from "react";
 
 const editorConfiguration2 = {
   toolbar: [
@@ -46,22 +45,43 @@ const editorConfiguration2 = {
     "redo",
   ],
 };
-function CustomEditor(props) {
+
+export interface CustomEditorProps {
+  initialData?: string;
+  onChange: (event: any, editor: Editor) => void;
+}
+
+export interface CustomEditorRef {
+  setContent: (content: string) => void;
+}
+
+const CustomEditor = forwardRef<CustomEditorRef, CustomEditorProps>(({ initialData, onChange }, ref) => {
+  const editorRef = useRef<Editor | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    setContent: (content: string) => {
+      if (editorRef.current) {
+        editorRef.current.setData(content);
+      }
+    },
+  }));
+
   return (
     <div>
       <CKEditor
         editor={Editor}
-        data={props.initialData}
+        data={initialData}
         config={editorConfiguration2}
-        onChange={props.onChange}
+        onChange={onChange}
         onReady={(editor) => {
           //console.log("Editor is ready to use!", editor.ui.getEditableElement());
-
+          editorRef.current = editor;
+          console.log(editorRef);
           // Insert the toolbar before the editable area.
-          if (editor.ui.getEditableElement()) {
-            editor.ui
-              .getEditableElement()
-              .parentElement.insertBefore(editor.ui.view.toolbar.element, editor.ui.getEditableElement());
+          const editableElement = editor.ui.getEditableElement();
+          const toolbarElement = editor.ui.view.toolbar.element;
+          if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement) {
+            editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
           }
 
           //this.editor = editor;
@@ -69,6 +89,8 @@ function CustomEditor(props) {
       />
     </div>
   );
-}
+});
+
+CustomEditor.displayName = "CustomEditor";
 
 export default CustomEditor;

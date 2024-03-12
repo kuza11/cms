@@ -4,9 +4,19 @@ import { NamesData } from "./api/getNames";
 import styles from "../styles/index.module.css";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Head from "next/head";
+import {readFileSync} from "fs";
+import { InferGetStaticPropsType } from "next";
 const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
 
-function Index() {
+export function getStaticProps() {
+  const ckStyles = readFileSync("./src/styles/ckStyles.css", "utf8");
+  return {
+    props: { ckStyles },
+  }
+}
+
+function Index({ckStyles}: InferGetStaticPropsType<typeof getStaticProps>) {
   const [pageNum, setPageNum] = useState(1);
 
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?id=${pageNum}`, fetcher);
@@ -14,6 +24,12 @@ function Index() {
 
   return (
     <>
+    <Head>
+      <style>
+        {ckStyles}
+      </style>
+    </Head>
+    <div className={styles.container}>
       <div className={styles.header}>
         {namesError ? (
           <p>Failed to load pages</p>
@@ -38,7 +54,7 @@ function Index() {
           </>
         ) : page ? (
           <>
-            <div
+            <div className="ck-content"
               dangerouslySetInnerHTML={{
                 __html: page.content,
               }}
@@ -48,6 +64,7 @@ function Index() {
           "Loading..."
         )}
       </div>
+    </div>
     </>
   );
 }

@@ -1,7 +1,11 @@
+.container{
+  min-height: 100vh;
+}
+
 .header{
   display: flex;
   flex-direction: row;
-  justify-content: left;
+  justify-content: flex-start;
   align-items: center;
   gap: 1rem;
   border-bottom: 1px solid black;
@@ -11,7 +15,7 @@
 
 .pages{
   width: fit-content;
-  font-size: 30px;
+  font-size: 32px;
   transition: transform 0.3s ease;
 }
 
@@ -23,6 +27,7 @@
 
 .page{
   padding: 1rem;
+  min-height: calc(100vh - 6rem - 4px - 5px);
 }
 
 .pages:hover{
@@ -32,4 +37,13 @@
 
 .cke{
   border-bottom: 1px solid black;
+}
+
+.buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
 }

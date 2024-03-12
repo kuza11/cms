@@ -1,9 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/server/db";
 
-
-const prisma = new PrismaClient();
 export interface PageData extends Object {
   id: number,
   pageNum: number,
