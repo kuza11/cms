@@ -1,16 +1,12 @@
-import React, {useRef}  from "react";
+import React, { useRef } from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { PageData } from "../api/getPage";
-import { NamesData } from "../api/getNames";
+import { NumsNamesData } from "../api/getNumsNames";
 import { useState } from "react";
 import Editor from "ckeditor5-custom-build";
 import styles from "../../styles/index.module.css";
-
 import api from "../../../api.json";
-
-const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
-
 
 const CustomEditor = dynamic(
   () => {
@@ -19,26 +15,21 @@ const CustomEditor = dynamic(
   { ssr: false }
 );
 
-interface CustomEditorProps {
-  onChange: (event: any, editor: Editor) => void;
-  initialData?: string;
-}
-
-
+const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
 
 function Index() {
-  const [id, setid] = useState(1);
+  const [pageNum, setPageNum] = useState(1);
   const [pageContent, setPageContent] = useState("");
   const editorRef = useRef<Editor | null>(null);
 
-  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?id=${id}`, fetcher);
+  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
 
-  if (pageContent == "" && page) setPageContent(page.content);
+  if (pageContent == "" && page) setPageContent(page.content ? page.content : "");
 
-  const { data: names, error: namesError } = useSWR<NamesData>("/api/getNames", fetcher);
+  const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
   function save() {
-    if(page){
+    if (page) {
       page.content = pageContent;
     }
     fetch("/api/setPage", {
@@ -47,31 +38,32 @@ function Index() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: id,
+        id: page?.id,
         content: pageContent,
         key: api.key,
       }),
     });
   }
 
+  console.log("asdsad");
+
   function cancel() {
-    if(page?.content)
-    editorRef.current?.setData(page?.content);
+    if (page?.content) editorRef.current?.setData(page?.content);
   }
 
   return (
     <>
       <div className={styles.header}>
-        {namesError ? (
+        {numsNamesError ? (
           <p>Failed to load pages</p>
-        ) : names ? (
-          names.map((name) => (
+        ) : numsNames ? (
+          numsNames.map((numName) => (
             <div
-              className={id === name.id ? styles.pages + " " + styles.active : styles.pages}
-              onClick={() => setid(name.id)}
-              key={name.id}
+              className={pageNum === numName.pageNum ? styles.pages + " " + styles.active : styles.pages}
+              onClick={() => setPageNum(numName.pageNum)}
+              key={numName.pageNum}
             >
-              {name.name}
+              {numName.name}
             </div>
           ))
         ) : (
@@ -87,9 +79,8 @@ function Index() {
               onChange={(event, editor) => {
                 setPageContent(editor.getData());
               }}
-              initialData={page?.content}
+              initialData={page?.content ? page?.content : " "}
               onReady={(editor) => {
-                //console.log("Editor is ready to use!", editor.ui.getEditableElement());
                 editorRef.current = editor;
                 // Insert the toolbar before the editable area.
                 const editableElement = editor.ui.getEditableElement();
@@ -97,14 +88,12 @@ function Index() {
                 if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement) {
                   editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
                 }
-      
-                //this.editor = editor;
               }}
             />
           </div>
           <div className={styles.buttons}>
-          <button onClick={cancel}>Cancel</button>
-          <button onClick={save}>Save</button>
+            <button onClick={cancel}>Cancel</button>
+            <button onClick={save}>Save</button>
           </div>
         </>
       ) : (
