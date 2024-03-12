@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
+import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
 
@@ -49,22 +49,11 @@ const editorConfiguration2 = {
 export interface CustomEditorProps {
   initialData?: string;
   onChange: (event: any, editor: Editor) => void;
+  onReady: (editor: Editor) => void;
 }
 
-export interface CustomEditorRef {
-  setContent: (content: string) => void;
-}
+const CustomEditor = ({ initialData, onChange,  onReady}: CustomEditorProps) => {
 
-const CustomEditor = forwardRef<CustomEditorRef, CustomEditorProps>(({ initialData, onChange }, ref) => {
-  const editorRef = useRef<Editor | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    setContent: (content: string) => {
-      if (editorRef.current) {
-        editorRef.current.setData(content);
-      }
-    },
-  }));
 
   return (
     <div>
@@ -73,23 +62,11 @@ const CustomEditor = forwardRef<CustomEditorRef, CustomEditorProps>(({ initialDa
         data={initialData}
         config={editorConfiguration2}
         onChange={onChange}
-        onReady={(editor) => {
-          //console.log("Editor is ready to use!", editor.ui.getEditableElement());
-          editorRef.current = editor;
-          console.log(editorRef);
-          // Insert the toolbar before the editable area.
-          const editableElement = editor.ui.getEditableElement();
-          const toolbarElement = editor.ui.view.toolbar.element;
-          if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement) {
-            editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
-          }
-
-          //this.editor = editor;
-        }}
+        onReady={onReady}
       />
     </div>
   );
-});
+};
 
 CustomEditor.displayName = "CustomEditor";
 

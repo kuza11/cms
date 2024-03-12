@@ -1,4 +1,4 @@
-import React, { RefAttributes, useEffect, useRef } from "react";
+import React, {useRef}  from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { PageData } from "../api/getPage";
@@ -24,14 +24,12 @@ interface CustomEditorProps {
   initialData?: string;
 }
 
-interface CustomEditorRef {
-  setContent: (content: string) => void;
-}
+
 
 function Index() {
   const [id, setid] = useState(1);
   const [pageContent, setPageContent] = useState("");
-  const editorRef = useRef<CustomEditorRef>(null);
+  const editorRef = useRef<Editor | null>(null);
 
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?id=${id}`, fetcher);
 
@@ -54,10 +52,8 @@ function Index() {
   }
 
   function cancel() {
-    console.log(editorRef.current);
-    if (editorRef.current) {
-      editorRef.current.setContent(page?.content || "");
-    }
+    if(page?.content)
+    editorRef.current?.setData(page?.content);
   }
 
   return (
@@ -85,12 +81,22 @@ function Index() {
         <>
           <div className={styles.cke}>
             <CustomEditor
-              ref={editorRef}
               onChange={(event, editor) => {
                 setPageContent(editor.getData());
               }}
               initialData={page?.content}
-              
+              onReady={(editor) => {
+                //console.log("Editor is ready to use!", editor.ui.getEditableElement());
+                editorRef.current = editor;
+                // Insert the toolbar before the editable area.
+                const editableElement = editor.ui.getEditableElement();
+                const toolbarElement = editor.ui.view.toolbar.element;
+                if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement) {
+                  editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
+                }
+      
+                //this.editor = editor;
+              }}
             />
           </div>
           <div className={styles.buttons}>
