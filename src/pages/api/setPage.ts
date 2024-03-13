@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   if(req.body.key !== api.key) return res.status(401).json(null);
   if (!req.body.id) return res.status(404).json(null);
   let id: number = +req.body.id;
-  if (isNaN(id)) return res.status(404).json(null);
+  if (isNaN(id)) return res.status(400).json(null);
   try {
     await prisma.pages.update({
       where: {

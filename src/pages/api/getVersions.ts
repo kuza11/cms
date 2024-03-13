@@ -17,7 +17,7 @@ export default async function handler(
   if(req.body.key !== api.key) return res.status(401).json(null);
   if(!req.query.num) return res.status(404).json(null);
   let num: number = +req.query.num
-  if(isNaN(num)) return res.status(404).json(null);
+  if(isNaN(num)) return res.status(400).json(null);
   const getVersions: VersionsData | null = await prisma.pages.findMany({
     where: {
       pageNum: num,

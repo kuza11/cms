@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/server/db";
 import api from "../../../api.json";
 
-export interface NumsNamesData extends Array<{ pageNum: number, name: string }> {};
+export interface NumsNamesData extends Array<{ pageNum: number, name: string, id: number }> {};
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +14,8 @@ export default async function handler(
     distinct: ["pageNum"],
     select: {
       pageNum: true,
-      name: true
+      name: true,
+      id: true
     },
   });
   res.status(200).json(getNames);

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { PageData } from "../api/getPage";
@@ -23,8 +23,6 @@ enum SaveState {
   None = "None",
 }
 
-let timeout: NodeJS.Timeout;
-
 const fetcher = (...args: Parameters<typeof fetch>) => {
   args[1] = {
     method: "POST",
@@ -44,23 +42,31 @@ function Index() {
   const [pageContent, setPageContent] = useState("");
   const [saveState, setSaveState] = useState(SaveState.None);
   const editorRef = useRef<Editor | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(`/api/getVersions?num=${pageNum}`, fetcher);
+  const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(
+    `/api/getVersions?num=${pageNum}`,
+    fetcher
+  );
 
-  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
+  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}&version=${pageVersion}`, fetcher);
+
+  const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
   if (pageContent == "" && page) setPageContent(page.content ? page.content : "");
   if (pageVersion == null && page) setPageVersion(page.pageVersion);
 
-  const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
+  useEffect(() => {
+    setPageVersion(null);
+  }, [pageNum]);
 
   function save() {
-    if (timeout) clearTimeout(timeout);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setSaveState(SaveState.Saving);
     if (page) {
       page.content = pageContent;
     }
-    const res = fetch("/api/setPage", {
+    fetch("/api/setPage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +82,7 @@ function Index() {
       } else {
         setSaveState(SaveState.Error);
       }
-      timeout = setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         setSaveState(SaveState.None);
       }, 4000);
     });
@@ -104,12 +110,26 @@ function Index() {
         ) : (
           "Loading..."
         )}
-        <div className={styles.vesrions}>
-          <div>Versions:</div>
-          {
-
-          }
-        </div>
+      </div>
+      <div className={styles.versionsHeader}>
+        <div style={{ marginRight: ".5rem" }}>Verze:</div>
+        {pageVersionsError ? (
+          <div>Failed to load versions</div>
+        ) : pageVersions ? (
+          pageVersions.map((version) => (
+            <div
+              className={
+                pageVersion === version.pageVersion ? styles.versions + " " + styles.activeVersion : styles.versions
+              }
+              onClick={() => setPageVersion(version.pageVersion)}
+              key={version.pageVersion}
+            >
+              {version.pageVersion}
+            </div>
+          ))
+        ) : (
+          "Loading..."
+        )}
       </div>
       {pageError ? (
         <p>Failed to load page</p>
