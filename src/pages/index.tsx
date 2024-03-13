@@ -6,7 +6,21 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import { readFileSync } from "fs";
 import { InferGetStaticPropsType } from "next";
-const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
+import api from "../../api.json";
+
+const fetcher = (...args: Parameters<typeof fetch>) => {
+  args[1] = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      key: api.key,
+    }),
+  };
+  console.log(args);
+  return fetch(...args).then((res) => res.json());
+};
 
 export function getStaticProps() {
   const ckStyles = readFileSync("./src/styles/ckStyles.css", "utf8");
@@ -52,7 +66,6 @@ function Index({ ckStyles }: InferGetStaticPropsType<typeof getStaticProps>) {
           ) : page ? (
             <>
               <div
-                className="ck-content"
                 dangerouslySetInnerHTML={{
                   __html: page.content ? page.content : "",
                 }}

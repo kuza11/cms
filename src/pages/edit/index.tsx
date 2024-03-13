@@ -15,11 +15,32 @@ const CustomEditor = dynamic(
   { ssr: false }
 );
 
-const fetcher = (...args: Parameters<typeof fetch>) => fetch(...args).then((res) => res.json());
+enum SaveState {
+  Saved = "Saved",
+  Saving = "Saving",
+  Error = "Error",
+  None = "None",
+}
+
+let timeout: NodeJS.Timeout;
+
+const fetcher = (...args: Parameters<typeof fetch>) => {
+  args[1] = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      key: api.key,
+    }),
+  };
+  return fetch(...args).then((res) => res.json());
+};
 
 function Index() {
   const [pageNum, setPageNum] = useState(1);
   const [pageContent, setPageContent] = useState("");
+  const [saveState, setSaveState] = useState(SaveState.None);
   const editorRef = useRef<Editor | null>(null);
 
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
@@ -29,10 +50,12 @@ function Index() {
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
   function save() {
+    if (timeout) clearTimeout(timeout);
+    setSaveState(SaveState.Saving);
     if (page) {
       page.content = pageContent;
     }
-    fetch("/api/setPage", {
+    const res = fetch("/api/setPage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,10 +65,17 @@ function Index() {
         content: pageContent,
         key: api.key,
       }),
+    }).then((res) => {
+      if (res.status == 200) {
+        setSaveState(SaveState.Saved);
+      } else {
+        setSaveState(SaveState.Error);
+      }
+      timeout = setTimeout(() => {
+        setSaveState(SaveState.None);
+      }, 4000);
     });
   }
-
-  console.log("asdsad");
 
   function cancel() {
     if (page?.content) editorRef.current?.setData(page?.content);
@@ -94,6 +124,18 @@ function Index() {
           <div className={styles.buttons}>
             <button onClick={cancel}>Cancel</button>
             <button onClick={save}>Save</button>
+            <div
+              className={styles.saveIco}
+              style={{ color: saveState == SaveState.Saved ? "green" : saveState == SaveState.Error ? "red" : "black", textAlign: "right" }}
+            >
+              {saveState == SaveState.Saving
+                ? "..."
+                : saveState == SaveState.Saved
+                ? "✓"
+                : saveState == SaveState.Error
+                ? "✗"
+                : ""}
+            </div>
           </div>
         </>
       ) : (

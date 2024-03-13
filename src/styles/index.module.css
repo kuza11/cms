@@ -45,5 +45,12 @@
   justify-content: flex-end;
   align-items: center;
   padding: 1rem;
-  gap: 1rem;
+}
+
+.buttons button{
+  margin-left: 1rem;
+}
+
+.saveIco{
+  width: 1rem;
 }
