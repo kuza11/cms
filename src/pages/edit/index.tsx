@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { PageData } from "../api/getPage";
 import { NumsNamesData } from "../api/getNumsNames";
 import { VersionsData } from "../api/getVersions";
@@ -39,33 +39,47 @@ const fetcher = (...args: Parameters<typeof fetch>) => {
 function Index() {
   const [pageNum, setPageNum] = useState(1);
   const [pageVersion, setPageVersion] = useState<number | null>(null);
-  const [pageContent, setPageContent] = useState("");
+  const [pageContent, setPageContent] = useState<string | null>(null);
   const [saveState, setSaveState] = useState(SaveState.None);
+  const [changed, setChanged] = useState(false);
   const editorRef = useRef<Editor | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pageContentOld = useRef<string | null>(null)
 
   const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(
     `/api/getVersions?num=${pageNum}`,
     fetcher
   );
-
-  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}&version=${pageVersion}`, fetcher);
-
+  const { data: page, error: pageError } = useSWR<PageData>(
+    `/api/getPage?num=${pageNum}&version=${pageVersion}`,
+    fetcher
+  );
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
-  if (pageContent == "" && page) setPageContent(page.content ? page.content : "");
-  if (pageVersion == null && page) setPageVersion(page.pageVersion);
+  const { mutate } = useSWRConfig();
+
+  if (pageContent == null && page) {
+    setPageContent(page.content ? page.content : "");
+  }
+  if (pageVersion == null && page){
+    setPageVersion(pageVersions ? pageVersions[0].pageVersion : null);
+  }
 
   useEffect(() => {
     setPageVersion(null);
+    setChanged(false);
   }, [pageNum]);
 
+  useEffect(() =>{
+    setChanged(false);
+  },[pageVersion])
+
+
   function save() {
+    if(!changed) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setSaveState(SaveState.Saving);
-    if (page) {
-      page.content = pageContent;
-    }
+    pageContentOld.current = page?.content ? page.content : "";
     fetch("/api/setPage", {
       method: "POST",
       headers: {
@@ -79,12 +93,16 @@ function Index() {
     }).then((res) => {
       if (res.status == 200) {
         setSaveState(SaveState.Saved);
+        editorRef.current?.setData(pageContentOld.current != null ? pageContentOld.current : "");
       } else {
         setSaveState(SaveState.Error);
       }
       timeoutRef.current = setTimeout(() => {
         setSaveState(SaveState.None);
       }, 4000);
+      mutate(`/api/getVersions?num=${pageNum}`);
+      mutate(`/api/getPage?num=${pageNum}&version=${pageVersions ? pageVersions[0].pageVersion + 1 : ""}`);
+      setPageVersion(pageVersions ? pageVersions[0].pageVersion + 1 : null);
     });
   }
 
@@ -139,6 +157,7 @@ function Index() {
             <CustomEditor
               onChange={(event, editor) => {
                 setPageContent(editor.getData());
+                setChanged(true);
               }}
               initialData={page?.content ? page?.content : " "}
               onReady={(editor) => {
@@ -153,8 +172,8 @@ function Index() {
             />
           </div>
           <div className={styles.buttons}>
-            <button onClick={cancel}>Cancel</button>
-            <button onClick={save}>Save</button>
+            <button disabled={!changed} onClick={cancel}>Cancel</button>
+            <button disabled={!changed} onClick={save}>Save</button>
             <div
               className={styles.saveIco}
               style={{
