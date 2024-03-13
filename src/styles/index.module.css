@@ -13,6 +13,14 @@
   padding: 1rem;
 }
 
+.versions{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
 .pages{
   width: fit-content;
   font-size: 32px;

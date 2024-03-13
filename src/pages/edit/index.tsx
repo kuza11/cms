@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { PageData } from "../api/getPage";
 import { NumsNamesData } from "../api/getNumsNames";
+import { VersionsData } from "../api/getVersions";
 import { useState } from "react";
 import Editor from "ckeditor5-custom-build";
 import styles from "../../styles/index.module.css";
@@ -39,13 +40,17 @@ const fetcher = (...args: Parameters<typeof fetch>) => {
 
 function Index() {
   const [pageNum, setPageNum] = useState(1);
+  const [pageVersion, setPageVersion] = useState<number | null>(null);
   const [pageContent, setPageContent] = useState("");
   const [saveState, setSaveState] = useState(SaveState.None);
   const editorRef = useRef<Editor | null>(null);
 
+  const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(`/api/getVersions?num=${pageNum}`, fetcher);
+
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
 
   if (pageContent == "" && page) setPageContent(page.content ? page.content : "");
+  if (pageVersion == null && page) setPageVersion(page.pageVersion);
 
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
@@ -99,6 +104,12 @@ function Index() {
         ) : (
           "Loading..."
         )}
+        <div className={styles.vesrions}>
+          <div>Versions:</div>
+          {
+
+          }
+        </div>
       </div>
       {pageError ? (
         <p>Failed to load page</p>
@@ -126,7 +137,10 @@ function Index() {
             <button onClick={save}>Save</button>
             <div
               className={styles.saveIco}
-              style={{ color: saveState == SaveState.Saved ? "green" : saveState == SaveState.Error ? "red" : "black", textAlign: "right" }}
+              style={{
+                color: saveState == SaveState.Saved ? "green" : saveState == SaveState.Error ? "red" : "black",
+                textAlign: "right",
+              }}
             >
               {saveState == SaveState.Saving
                 ? "..."
