@@ -15,7 +15,7 @@ module.exports = {
       path: "/home/deploy/netlogy/skola",
       "pre-deploy-local": "",
       "post-deploy":
-        "pnpm install && pnpm run build && pm2 reload ecosystem.config.js --env production && pnpm prisma db push",
+        "pnpm prisma generate && pnpm install && pnpm run build && pm2 reload ecosystem.config.js --env production && pnpm prisma db push",
       "pre-setup": "",
     },
   },
