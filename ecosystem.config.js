@@ -1,6 +1,7 @@
 module.exports = {
   apps: [
     {
+      name: "cms",
       script: "pnpm start",
     },
   ],
