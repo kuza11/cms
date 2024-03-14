@@ -40,6 +40,7 @@ function Index({ ckStyles }: InferGetStaticPropsType<typeof getStaticProps>) {
     <>
       <Head>
         <style>{ckStyles}</style>
+        <title>{page?.name ? page.name : "Loading..."}</title>
       </Head>
       <div className={styles.container}>
         <div className={styles.header}>

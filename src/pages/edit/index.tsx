@@ -8,6 +8,8 @@ import { useState } from "react";
 import Editor from "ckeditor5-custom-build";
 import styles from "../../styles/index.module.css";
 import api from "../../../api.json";
+import Head from "next/head";
+
 
 interface CustomEditorProps {
   initialData: string;
@@ -44,6 +46,7 @@ const fetcher = (...args: Parameters<typeof fetch>) => {
 };
 
 function Index() {
+  const [signed, setSigned] = useState(false);
   const [pageNum, setPageNum] = useState(1);
   const [pageVersion, setPageVersion] = useState<number | null>(null);
   const [pageContent, setPageContent] = useState<string | null>(null);
@@ -54,7 +57,8 @@ function Index() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pageContentOldRef = useRef<string | null>(null);
   const toolboxStateRef = useRef<boolean>(false);
-  const renameRef = useRef<HTMLInputElement>(null)
+  const renameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(
     `/api/getVersions?num=${pageNum}`,
@@ -170,7 +174,7 @@ function Index() {
   }
 
   function rename() {
-    if(renameRef.current?.value == null || renameRef.current.value == "") return;
+    if (renameRef.current?.value == null || renameRef.current.value == "") return;
     fetch("/api/updatePage", {
       method: "POST",
       headers: {
@@ -185,21 +189,66 @@ function Index() {
       if (res.status == 200) {
         mutate(`/api/getNumsNames`);
         mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
-
       }
     });
   }
 
-  function deletePage(){
+  function deletePage() {}
 
+  function deleteVersion() {
+    console.log(page?.id);
+    fetch("/api/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: page?.id,
+        key: api.key,
+      }),
+    }).then((res) => {
+      if (res.status == 200) {
+        mutate(`/api/getNumsNames`);
+        mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
+        mutate(`/api/getVersions?num=${pageNum}`);
+      }
+    });
   }
 
-  function deleteVersion(){
-
+  function login(){
+    if(passwordRef.current?.value == null || passwordRef.current.value == "") return;
+    fetch("/api/checkPass", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: passwordRef.current.value,
+        key: api.key,
+      }),
+    }).then((res)=>{
+      if(res.status == 200){
+        setSigned(true);
+      }
+      else if (res.status == 401){
+        if(passwordRef.current)
+        passwordRef.current.value = "";
+        alert("Špatne heslo");
+        setSigned(false);
+        
+      } else {
+        alert("Nastala chyba");
+        setSigned(false);
+      }
+    })
+    
   }
 
-  return (
+  return signed ? (
     <>
+      <Head>
+        <title>{"Editace: " + (page?.name ? page.name : "Loading...")}</title>
+      </Head>
       <div className={styles.header}>
         {numsNamesError ? (
           <p>Failed to load pages</p>
@@ -231,11 +280,9 @@ function Index() {
         ) : pageVersions ? (
           pageVersions.map((version) => (
             <div
-              className={
-                `${
-                  pageVersion === version.pageVersion ? styles.versions + " " + styles.activeVersion : styles.versions
-                } ${version.hidden ? styles.black : styles.blue}`
-              }
+              className={`${
+                pageVersion === version.pageVersion ? styles.versions + " " + styles.activeVersion : styles.versions
+              } ${version.hidden ? styles.black : styles.blue}`}
               onClick={() => setPageVersion(version.pageVersion)}
               key={version.pageVersion}
             >
@@ -252,8 +299,10 @@ function Index() {
           <button onClick={deleteVersion}>Smazat Verzi</button>
           <button onClick={deletePage}>Smazat Stránku</button>
           <div>
-            <input type="text" placeholder={page?.name} ref={renameRef}/>
-            <button onClick={rename} style={{marginLeft: ".5rem"}}>Přejmenovat</button>
+            <input type="text" placeholder={page?.name} ref={renameRef} />
+            <button onClick={rename} style={{ marginLeft: ".5rem" }}>
+              Přejmenovat
+            </button>
           </div>
         </div>
       ) : (
@@ -313,6 +362,14 @@ function Index() {
       ) : (
         "Loading..."
       )}
+    </>
+  ) : (
+    <>
+      <div style={{width: "100%", height: "20rem", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: " 1rem" }}>
+        <label>Heslo:</label>
+        <input type="password" ref={passwordRef} />
+        <button onClick={login}>Login</button>
+      </div>
     </>
   );
 }

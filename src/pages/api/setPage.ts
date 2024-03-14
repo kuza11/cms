@@ -23,24 +23,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       },
     });
     if (!page) return res.status(404).json(null);
-    const version = await prisma.pages.findFirst({
-      where: {
-        pageNum: page?.pageNum
-      },
-      select: {
-        pageVersion: true
-      },
-      orderBy: {
-        pageVersion: "desc"
-      }
-    }).then(res => res?.pageVersion ?? null)
-    if(!version) return res.status(404).json(null)
+    const version = await prisma.pages
+      .findFirst({
+        where: {
+          pageNum: page?.pageNum,
+        },
+        select: {
+          pageVersion: true,
+        },
+        orderBy: {
+          pageVersion: "desc",
+        },
+      })
+      .then((res) => res?.pageVersion ?? null);
+    if (!version) return res.status(404).json(null);
     await prisma.pages.create({
       data: {
         pageNum: page.pageNum,
         pageVersion: version + 1,
         name: page.name,
-        content: req.body.content
+        content: req.body.content,
       },
     });
   } catch (error) {

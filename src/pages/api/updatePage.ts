@@ -33,11 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (hidden != null && num != null) {
       await prisma.pages.updateMany({
         where: {
-          pageNum: num
+          pageNum: num,
         },
         data: {
-          hidden: true
-        }
+          hidden: true,
+        },
       });
       await prisma.pages.update({
         where: {
