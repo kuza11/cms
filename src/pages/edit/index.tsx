@@ -9,7 +9,13 @@ import Editor from "ckeditor5-custom-build";
 import styles from "../../styles/index.module.css";
 import api from "../../../api.json";
 
-const CustomEditor = dynamic(
+interface CustomEditorProps {
+  initialData: string;
+  onChange: (event: any, editor: Editor) => void;
+  onReady: (editor: Editor) => void;
+}
+
+const CustomEditor: React.ComponentType<CustomEditorProps> = dynamic(
   () => {
     return import("../../components/custom-editor");
   },

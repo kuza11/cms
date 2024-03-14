@@ -16,6 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/custom-editor.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/custom-editor.ts", "src/components/custom-editor.jsx"],
   "exclude": ["node_modules"]
 }

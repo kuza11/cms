@@ -156,7 +156,7 @@ class Editor extends DecoupledEditor {
 				'redo'
 			]
 		},
-		language: 'cs',
+		/*language: 'cs',
 		image: {
 			toolbar: [
 				'imageTextAlternative',
@@ -174,7 +174,7 @@ class Editor extends DecoupledEditor {
 				'tableCellProperties',
 				'tableProperties'
 			]
-		}
+		}*/
 	};
 }
 

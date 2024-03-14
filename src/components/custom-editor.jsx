@@ -2,7 +2,7 @@ import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "ckeditor5-custom-build";
 
-const editorConfiguration2 = {
+const editorConfiguration = {
   toolbar: [
     "heading",
     "|",
@@ -46,13 +46,13 @@ const editorConfiguration2 = {
   ],
 };
 
-export interface CustomEditorProps {
+/*export interface CustomEditorProps {
   initialData?: string;
   onChange: (event: any, editor: Editor) => void;
   onReady: (editor: Editor) => void;
-}
+}*/
 
-const CustomEditor = ({ initialData, onChange,  onReady}: CustomEditorProps) => {
+const CustomEditor = ({ initialData, onChange,  onReady}) => {
 
 
   return (
@@ -60,7 +60,7 @@ const CustomEditor = ({ initialData, onChange,  onReady}: CustomEditorProps) => 
       <CKEditor
         editor={Editor}
         data={initialData}
-        config={editorConfiguration2}
+        config={editorConfiguration}
         onChange={onChange}
         onReady={onReady}
       />
