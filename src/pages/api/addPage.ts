@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     await prisma.pages.create({
       data: {
         pageNum: num + 1,
-        name: `Test Page ${num + 1}`,
+        name: `New Page ${num + 1}`,
       },
     });
   } catch (error) {

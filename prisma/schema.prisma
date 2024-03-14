@@ -21,6 +21,7 @@ model Admin {
 
 model Pages {
   id          Int      @id @default(autoincrement())
+  hidden      Boolean  @default(true)
   pageNum     Int
   pageVersion Int      @default(1)
   name        String   

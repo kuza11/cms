@@ -4,6 +4,7 @@ import api from "../../../api.json";
 
 export interface PageData extends Object {
   id: number;
+  hidden: boolean;
   pageNum: number;
   pageVersion: number;
   name: string;
@@ -30,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     },
     select: {
       id: true,
+      hidden: true,
       pageNum: true,
       pageVersion: true,
       name: true,
@@ -48,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       },
       select: {
         id: true,
+        hidden: true,
         pageNum: true,
         pageVersion: true,
         name: true,

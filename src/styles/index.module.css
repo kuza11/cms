@@ -7,7 +7,7 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   border-bottom: 1px solid black;
   height: fit-content;
   padding: 1rem;

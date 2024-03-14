@@ -48,6 +48,7 @@ function Index() {
   const [pageContent, setPageContent] = useState<string | null>(null);
   const [saveState, setSaveState] = useState(SaveState.None);
   const [changed, setChanged] = useState(false);
+  const [pageHidden, setPageHidden] = useState<boolean | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pageContentOldRef = useRef<string | null>(null);
@@ -68,8 +69,11 @@ function Index() {
   if (pageContent == null && page) {
     setPageContent(page.content ? page.content : "");
   }
-  if (pageVersion == null && page){
+  if (pageVersion == null && page) {
     setPageVersion(pageVersions ? pageVersions[0].pageVersion : null);
+  }
+  if(pageHidden == null && page) {
+    setPageHidden(page.hidden ?? true);
   }
 
   useEffect(() => {
@@ -78,14 +82,13 @@ function Index() {
     toolboxStateRef.current = false;
   }, [pageNum]);
 
-  useEffect(() =>{
+  useEffect(() => {
     setChanged(false);
     toolboxStateRef.current = false;
-  },[pageVersion])
-
+  }, [pageVersion]);
 
   function save() {
-    if(!changed) return;
+    if (!changed) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setSaveState(SaveState.Saving);
     pageContentOldRef.current = page?.content ? page.content : "";
@@ -119,7 +122,7 @@ function Index() {
     if (page?.content) editorRef.current?.setData(page?.content);
   }
 
-  function addPage(){
+  function addPage() {
     fetch("/api/addPage", {
       method: "POST",
       headers: {
@@ -134,6 +137,10 @@ function Index() {
         setPageNum(numsNames ? numsNames[numsNames.length - 1].pageNum + 1 : pageNum);
       }
     });
+  }
+
+  function rename(){
+
   }
 
   return (
@@ -154,7 +161,13 @@ function Index() {
         ) : (
           "Loading..."
         )}
-        {numsNames ? (<div className={styles.plus} onClick={addPage}>+</div>) : ""}
+        {numsNames ? (
+          <div className={styles.plus} onClick={addPage}>
+            +
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className={styles.versionsHeader}>
         <div style={{ marginRight: ".5rem" }}>Verze:</div>
@@ -176,6 +189,13 @@ function Index() {
           "Loading..."
         )}
       </div>
+      <div className={styles.options}>
+        <button onClick={() => setPageHidden(!pageHidden)}>{pageHidden ? "Zobrazit" : "Skrýt"}</button>
+        <div>
+          <input type="text" value={page?.name} />
+          <button onClick={rename}>Přejmenovat</button>
+        </div>
+      </div>
       {pageError ? (
         <p>Failed to load page</p>
       ) : page ? (
@@ -192,7 +212,11 @@ function Index() {
                 // Insert the toolbar before the editable area.
                 const editableElement = editor.ui.getEditableElement();
                 const toolbarElement = editor.ui.view.toolbar.element;
-                if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement && !toolboxStateRef.current) {
+                if (
+                  editableElement instanceof HTMLElement &&
+                  toolbarElement instanceof HTMLElement &&
+                  !toolboxStateRef.current
+                ) {
                   editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
                   toolboxStateRef.current = true;
                 }
@@ -200,8 +224,12 @@ function Index() {
             />
           </div>
           <div className={styles.buttons}>
-            <button disabled={!changed} onClick={cancel}>Cancel</button>
-            <button disabled={!changed} onClick={save}>Save</button>
+            <button disabled={!changed} onClick={cancel}>
+              Cancel
+            </button>
+            <button disabled={!changed} onClick={save}>
+              Save
+            </button>
             <div
               className={styles.saveIco}
               style={{
