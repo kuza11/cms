@@ -160,11 +160,11 @@ function Index() {
       if (res.status == 200) {
         console.log(pageHidden);
         mutate(`/api/getNumsNames`);
-        mutate(`/api/getVersions?num=${pageNum}`)
-        mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`)
+        mutate(`/api/getVersions?num=${pageNum}`);
+        mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
         setPageHidden(!pageHidden);
       }
-    })
+    });
   }
 
   function rename() {}
@@ -203,8 +203,9 @@ function Index() {
           pageVersions.map((version) => (
             <div
               className={
-                /*pageVersion === version.pageVersion ? (styles.versions + " " + styles.activeVersion) : (styles.versions) + " " + version.hidden ? styles.black : styles.blue*/
-                `${pageVersion === version.pageVersion ? (styles.versions + " " + styles.activeVersion) : (styles.versions)} ${version.hidden ? styles.black : styles.blue}`
+                `${
+                  pageVersion === version.pageVersion ? styles.versions + " " + styles.activeVersion : styles.versions
+                } ${version.hidden ? styles.black : styles.blue}`
               }
               onClick={() => setPageVersion(version.pageVersion)}
               key={version.pageVersion}

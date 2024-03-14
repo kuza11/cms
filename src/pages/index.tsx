@@ -48,12 +48,12 @@ function Index({ ckStyles }: InferGetStaticPropsType<typeof getStaticProps>) {
           ) : numsNames ? (
             numsNames.map((numName) => (
               <div
-              className={pageNum === numName.pageNum ? styles.pages + " " + styles.active : styles.pages}
-              onClick={() => setPageNum(numName.pageNum)}
-              key={numName.pageNum}
-            >
-              {numName.name}
-            </div>
+                className={pageNum === numName.pageNum ? styles.pages + " " + styles.active : styles.pages}
+                onClick={() => setPageNum(numName.pageNum)}
+                key={numName.pageNum}
+              >
+                {numName.name}
+              </div>
             ))
           ) : (
             "Loading..."
