@@ -54,18 +54,20 @@ function Index() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pageContentOldRef = useRef<string | null>(null);
   const toolboxStateRef = useRef<boolean>(false);
+  const renameRef = useRef<HTMLInputElement>(null)
 
   const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(
     `/api/getVersions?num=${pageNum}`,
     fetcher
   );
 
-  console.log(pageVersions);
   const { data: page, error: pageError } = useSWR<PageData>(
     `/api/getPage?num=${pageNum}&version=${pageVersion}`,
     fetcher
   );
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
+
+  console.log(numsNames);
 
   const { mutate } = useSWRConfig();
 
@@ -153,12 +155,12 @@ function Index() {
       },
       body: JSON.stringify({
         id: page?.id,
+        num: page?.pageNum,
         hidden: !pageHidden,
         key: api.key,
       }),
     }).then((res) => {
       if (res.status == 200) {
-        console.log(pageHidden);
         mutate(`/api/getNumsNames`);
         mutate(`/api/getVersions?num=${pageNum}`);
         mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
@@ -167,7 +169,34 @@ function Index() {
     });
   }
 
-  function rename() {}
+  function rename() {
+    if(renameRef.current?.value == null || renameRef.current.value == "") return;
+    fetch("/api/updatePage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: page?.id,
+        name: renameRef.current?.value,
+        key: api.key,
+      }),
+    }).then((res) => {
+      if (res.status == 200) {
+        mutate(`/api/getNumsNames`);
+        mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
+
+      }
+    });
+  }
+
+  function deletePage(){
+
+  }
+
+  function deleteVersion(){
+
+  }
 
   return (
     <>
@@ -211,7 +240,6 @@ function Index() {
               key={version.pageVersion}
             >
               {version.pageVersion}
-              {version.hidden ? "1" : "0"}
             </div>
           ))
         ) : (
@@ -221,9 +249,11 @@ function Index() {
       {page ? (
         <div className={styles.options}>
           <button onClick={changeStataus}>{pageHidden ? "Zobrazit" : "Skrýt"}</button>
+          <button onClick={deleteVersion}>Smazat Verzi</button>
+          <button onClick={deletePage}>Smazat Stránku</button>
           <div>
-            <input type="text" value={page?.name} />
-            <button onClick={rename}>Přejmenovat</button>
+            <input type="text" placeholder={page?.name} ref={renameRef}/>
+            <button onClick={rename} style={{marginLeft: ".5rem"}}>Přejmenovat</button>
           </div>
         </div>
       ) : (

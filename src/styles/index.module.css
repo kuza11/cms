@@ -23,6 +23,7 @@
   height: fit-content;
   padding: 1rem;
   font-size: 20px;
+  border-bottom: 1px solid black;
 }
 
 .versions{
@@ -38,6 +39,15 @@
 .versions:hover{
   cursor: pointer;
   color: #555555;
+}
+
+.options{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 .pages{

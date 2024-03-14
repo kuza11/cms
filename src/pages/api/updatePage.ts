@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   if (isNaN(id)) return res.status(400).json(null);
   let hidden: boolean | null;
   let name: string | null;
+  let num: number | null;
   if (req.body.hidden != null) {
     if (typeof req.body.hidden !== "boolean") return res.status(400).json(null);
     hidden = req.body.hidden;
@@ -22,8 +23,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   } else {
     name = null;
   }
+  if (req.body.num) {
+    if (typeof req.body.num !== "number") return res.status(400).json(null);
+    num = req.body.num;
+  } else {
+    num = null;
+  }
   try {
-    if (hidden != null) {
+    if (hidden != null && num != null) {
+      await prisma.pages.updateMany({
+        where: {
+          pageNum: num
+        },
+        data: {
+          hidden: true
+        }
+      });
       await prisma.pages.update({
         where: {
           id: id,
