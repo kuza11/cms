@@ -18,7 +18,6 @@ const fetcher = (...args: Parameters<typeof fetch>) => {
       key: api.key,
     }),
   };
-  console.log(args);
   return fetch(...args).then((res) => res.json());
 };
 
@@ -34,6 +33,8 @@ function Index({ ckStyles }: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
+
+  console.log(numsNames);
 
   return (
     <>

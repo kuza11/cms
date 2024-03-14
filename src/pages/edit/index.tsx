@@ -37,6 +37,7 @@ const fetcher = (...args: Parameters<typeof fetch>) => {
     },
     body: JSON.stringify({
       key: api.key,
+      edit: true,
     }),
   };
   return fetch(...args).then((res) => res.json());
@@ -72,18 +73,20 @@ function Index() {
   if (pageVersion == null && page) {
     setPageVersion(pageVersions ? pageVersions[0].pageVersion : null);
   }
-  if(pageHidden == null && page) {
-    setPageHidden(page.hidden ?? true);
+  if (pageHidden == null && page) {
+    setPageHidden(page.hidden);
   }
 
   useEffect(() => {
     setPageVersion(null);
     setChanged(false);
+    setPageHidden(null);
     toolboxStateRef.current = false;
   }, [pageNum]);
 
   useEffect(() => {
     setChanged(false);
+    setPageHidden(null);
     toolboxStateRef.current = false;
   }, [pageVersion]);
 
@@ -139,9 +142,28 @@ function Index() {
     });
   }
 
-  function rename(){
-
+  function changeStataus() {
+    console.log(pageHidden);
+    fetch("/api/updatePage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: page?.id,
+        hidden: !pageHidden,
+        key: api.key,
+      }),
+    }).then((res) => {
+      if (res.status == 200) {
+        mutate(`/api/getNumsNames`);
+        mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`)
+        setPageHidden(!pageHidden);
+      }
+    })
   }
+
+  function rename() {}
 
   return (
     <>
@@ -189,13 +211,17 @@ function Index() {
           "Loading..."
         )}
       </div>
-      <div className={styles.options}>
-        <button onClick={() => setPageHidden(!pageHidden)}>{pageHidden ? "Zobrazit" : "Skrýt"}</button>
-        <div>
-          <input type="text" value={page?.name} />
-          <button onClick={rename}>Přejmenovat</button>
+      {page ? (
+        <div className={styles.options}>
+          <button onClick={changeStataus}>{pageHidden ? "Zobrazit" : "Skrýt"}</button>
+          <div>
+            <input type="text" value={page?.name} />
+            <button onClick={rename}>Přejmenovat</button>
+          </div>
         </div>
-      </div>
+      ) : (
+        ""
+      )}
       {pageError ? (
         <p>Failed to load page</p>
       ) : page ? (
