@@ -11,6 +11,7 @@
   border-bottom: 1px solid black;
   height: fit-content;
   padding: 1rem;
+  font-size: 32px;
 }
 
 .versionsHeader{
@@ -30,6 +31,8 @@
 
 .activeVersion{
   transform: translateY(-2px);
+  text-decoration: underline; 
+  text-underline-offset: 3px;
 }
 
 .versions:hover{
@@ -39,7 +42,6 @@
 
 .pages{
   width: fit-content;
-  font-size: 32px;
   transition: transform 0.3s ease;
 }
 
@@ -55,6 +57,11 @@
 }
 
 .pages:hover{
+  cursor: pointer;
+  color: #555555;
+}
+
+.plus:hover{
   cursor: pointer;
   color: #555555;
 }

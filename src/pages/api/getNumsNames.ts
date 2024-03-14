@@ -17,6 +17,9 @@ export default async function handler(
       name: true,
       id: true
     },
+    orderBy:{
+      pageNum: "asc"
+    }
   });
   res.status(200).json(getNames);
 }

@@ -119,6 +119,23 @@ function Index() {
     if (page?.content) editorRef.current?.setData(page?.content);
   }
 
+  function addPage(){
+    fetch("/api/addPage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        key: api.key,
+      }),
+    }).then((res) => {
+      if (res.status == 200) {
+        mutate(`/api/getNumsNames`);
+        setPageNum(numsNames ? numsNames[numsNames.length - 1].pageNum + 1 : pageNum);
+      }
+    });
+  }
+
   return (
     <>
       <div className={styles.header}>
@@ -137,6 +154,7 @@ function Index() {
         ) : (
           "Loading..."
         )}
+        {numsNames ? (<div className={styles.plus} onClick={addPage}>+</div>) : ""}
       </div>
       <div className={styles.versionsHeader}>
         <div style={{ marginRight: ".5rem" }}>Verze:</div>
