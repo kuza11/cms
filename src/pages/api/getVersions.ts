@@ -7,6 +7,7 @@ export interface VersionsData extends Array<{
   pageVersion: number,
   name: string,
   date: Date
+  hidden: boolean
 }> {};
 
 export default async function handler(
@@ -27,6 +28,7 @@ export default async function handler(
       pageVersion: true,
       name: true,
       date: true,
+      hidden: true
     },
     orderBy: {
       pageVersion: "desc",

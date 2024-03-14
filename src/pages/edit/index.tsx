@@ -59,6 +59,8 @@ function Index() {
     `/api/getVersions?num=${pageNum}`,
     fetcher
   );
+
+  console.log(pageVersions);
   const { data: page, error: pageError } = useSWR<PageData>(
     `/api/getPage?num=${pageNum}&version=${pageVersion}`,
     fetcher
@@ -156,7 +158,9 @@ function Index() {
       }),
     }).then((res) => {
       if (res.status == 200) {
+        console.log(pageHidden);
         mutate(`/api/getNumsNames`);
+        mutate(`/api/getVersions?num=${pageNum}`)
         mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`)
         setPageHidden(!pageHidden);
       }
@@ -199,12 +203,14 @@ function Index() {
           pageVersions.map((version) => (
             <div
               className={
-                pageVersion === version.pageVersion ? styles.versions + " " + styles.activeVersion : styles.versions
+                /*pageVersion === version.pageVersion ? (styles.versions + " " + styles.activeVersion) : (styles.versions) + " " + version.hidden ? styles.black : styles.blue*/
+                `${pageVersion === version.pageVersion ? (styles.versions + " " + styles.activeVersion) : (styles.versions)} ${version.hidden ? styles.black : styles.blue}`
               }
               onClick={() => setPageVersion(version.pageVersion)}
               key={version.pageVersion}
             >
               {version.pageVersion}
+              {version.hidden ? "1" : "0"}
             </div>
           ))
         ) : (
