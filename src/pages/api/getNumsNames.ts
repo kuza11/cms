@@ -45,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   if (edit) {
     let getNamesEdited: NumsNamesData = [];
+    if(getNames === null) { return res.status(404).json(null); }
     getNames.forEach(async (e) => {
       const getName = await prisma.pages.findFirst({
         where: {
