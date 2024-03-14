@@ -70,7 +70,6 @@ function Index() {
   );
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
 
-  console.log(numsNames);
 
   const { mutate } = useSWRConfig();
 
@@ -150,7 +149,6 @@ function Index() {
   }
 
   function changeStataus() {
-    console.log(pageHidden);
     fetch("/api/updatePage", {
       method: "POST",
       headers: {
@@ -186,6 +184,8 @@ function Index() {
       }),
     }).then((res) => {
       if (res.status == 200) {
+        if(renameRef.current)
+        renameRef.current.value = "";
         mutate(`/api/getNumsNames`);
         mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
       }
@@ -195,7 +195,6 @@ function Index() {
   function deletePage() {}
 
   function deleteVersion() {
-    console.log(page?.id);
     fetch("/api/delete", {
       method: "POST",
       headers: {
@@ -238,6 +237,8 @@ function Index() {
       }
     });
   }
+
+  
 
   return signed ? (
     <>
@@ -294,7 +295,7 @@ function Index() {
           <button onClick={deleteVersion}>Smazat Verzi</button>
           <button onClick={deletePage}>Smazat Stránku</button>
           <div>
-            <input type="text" placeholder={page?.name} ref={renameRef} />
+            <input type="text" placeholder={page?.name} ref={renameRef}  />
             <button onClick={rename} style={{ marginLeft: ".5rem" }}>
               Přejmenovat
             </button>
