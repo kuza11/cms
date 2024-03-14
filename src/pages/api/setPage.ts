@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
           pageVersion: "desc",
         },
       })
-      .then((res) => res?.pageVersion ?? null);
+      .then((res: { pageVersion: number } | null) => res?.pageVersion ?? null);
     if (!version) {
       prisma.$disconnect();
       return res.status(404).json(null);
