@@ -25,20 +25,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   if (version == null) {
     getPage = await prisma.pages.findFirst({
-      where: {
-        pageNum: num,
-      },
-      select: {
-        id: true,
-        pageNum: true,
-        pageVersion: true,
-        name: true,
-        content: true,
-        date: true,
-      },
-      orderBy: {
-        pageVersion: "desc",
-      },
+    where: {
+      pageNum: num,
+    },
+    select: {
+      id: true,
+      pageNum: true,
+      pageVersion: true,
+      name: true,
+      content: true,
+      date: true,
+    },
+    orderBy: {
+      pageVersion: "desc",
+    },
     });
   } else {
     getPage = await prisma.pages.findFirst({

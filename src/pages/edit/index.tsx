@@ -50,7 +50,8 @@ function Index() {
   const [changed, setChanged] = useState(false);
   const editorRef = useRef<Editor | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pageContentOld = useRef<string | null>(null)
+  const pageContentOldRef = useRef<string | null>(null);
+  const toolboxStateRef = useRef<boolean>(false);
 
   const { data: pageVersions, error: pageVersionsError } = useSWR<VersionsData>(
     `/api/getVersions?num=${pageNum}`,
@@ -74,10 +75,12 @@ function Index() {
   useEffect(() => {
     setPageVersion(null);
     setChanged(false);
+    toolboxStateRef.current = false;
   }, [pageNum]);
 
   useEffect(() =>{
     setChanged(false);
+    toolboxStateRef.current = false;
   },[pageVersion])
 
 
@@ -85,7 +88,7 @@ function Index() {
     if(!changed) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setSaveState(SaveState.Saving);
-    pageContentOld.current = page?.content ? page.content : "";
+    pageContentOldRef.current = page?.content ? page.content : "";
     fetch("/api/setPage", {
       method: "POST",
       headers: {
@@ -99,7 +102,7 @@ function Index() {
     }).then((res) => {
       if (res.status == 200) {
         setSaveState(SaveState.Saved);
-        editorRef.current?.setData(pageContentOld.current != null ? pageContentOld.current : "");
+        editorRef.current?.setData(pageContentOldRef.current != null ? pageContentOldRef.current : "");
       } else {
         setSaveState(SaveState.Error);
       }
@@ -171,8 +174,9 @@ function Index() {
                 // Insert the toolbar before the editable area.
                 const editableElement = editor.ui.getEditableElement();
                 const toolbarElement = editor.ui.view.toolbar.element;
-                if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement) {
+                if (editableElement instanceof HTMLElement && toolbarElement instanceof HTMLElement && !toolboxStateRef.current) {
                   editableElement.parentElement?.insertBefore(toolbarElement, editableElement);
+                  toolboxStateRef.current = true;
                 }
               }}
             />
