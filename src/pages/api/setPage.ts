@@ -11,18 +11,33 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<{ message: string } | null>) {
-  if (req.method !== "POST") return res.status(405).json(null);
-  if (req.body.key !== api.key) return res.status(401).json(null);
-  if (!req.body.id) return res.status(404).json(null);
+  if (req.method !== "POST") {
+    prisma.$disconnect();
+    return res.status(405).json(null);
+  }
+  if (req.body.key !== api.key) {
+    prisma.$disconnect();
+    return res.status(401).json(null);
+  }
+  if (!req.body.id) {
+    prisma.$disconnect();
+    return res.status(404).json(null);
+  }
   let id: number = +req.body.id;
-  if (isNaN(id)) return res.status(400).json(null);
+  if (isNaN(id)) {
+    prisma.$disconnect();
+    return res.status(400).json(null);
+  }
   try {
     const page = await prisma.pages.findUnique({
       where: {
         id: id,
       },
     });
-    if (!page) return res.status(404).json(null);
+    if (!page) {
+      prisma.$disconnect();
+      return res.status(404).json(null);
+    }
     const version = await prisma.pages
       .findFirst({
         where: {
@@ -36,7 +51,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         },
       })
       .then((res) => res?.pageVersion ?? null);
-    if (!version) return res.status(404).json(null);
+    if (!version) {
+      prisma.$disconnect();
+      return res.status(404).json(null);
+    }
     await prisma.pages.create({
       data: {
         pageNum: page.pageNum,
@@ -47,7 +65,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
   } catch (error) {
     console.log(error);
+    prisma.$disconnect();
     return res.status(500).json({ message: "error" });
   }
+  prisma.$disconnect();
   res.status(200).json({ message: "ok" });
 }

@@ -10,7 +10,6 @@ import styles from "../../styles/index.module.css";
 import api from "../../../api.json";
 import Head from "next/head";
 
-
 interface CustomEditorProps {
   initialData: string;
   onChange: (event: any, editor: Editor) => void;
@@ -215,8 +214,8 @@ function Index() {
     });
   }
 
-  function login(){
-    if(passwordRef.current?.value == null || passwordRef.current.value == "") return;
+  function login() {
+    if (passwordRef.current?.value == null || passwordRef.current.value == "") return;
     fetch("/api/checkPass", {
       method: "POST",
       headers: {
@@ -226,22 +225,18 @@ function Index() {
         password: passwordRef.current.value,
         key: api.key,
       }),
-    }).then((res)=>{
-      if(res.status == 200){
+    }).then((res) => {
+      if (res.status == 200) {
         setSigned(true);
-      }
-      else if (res.status == 401){
-        if(passwordRef.current)
-        passwordRef.current.value = "";
-        alert("Špatne heslo");
+      } else if (res.status == 401) {
+        if (passwordRef.current) passwordRef.current.value = "";
+        alert("Špatné heslo");
         setSigned(false);
-        
       } else {
         alert("Nastala chyba");
         setSigned(false);
       }
-    })
-    
+    });
   }
 
   return signed ? (
@@ -365,7 +360,17 @@ function Index() {
     </>
   ) : (
     <>
-      <div style={{width: "100%", height: "20rem", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: " 1rem" }}>
+      <div
+        style={{
+          width: "100%",
+          height: "20rem",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: " 1rem",
+        }}
+      >
         <label>Heslo:</label>
         <input type="password" ref={passwordRef} />
         <button onClick={login}>Login</button>

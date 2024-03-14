@@ -1,8 +1,8 @@
-.container{
+.container {
   min-height: 100vh;
 }
 
-.header{
+.header {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -14,7 +14,7 @@
   font-size: 32px;
 }
 
-.versionsHeader{
+.versionsHeader {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -26,22 +26,22 @@
   border-bottom: 1px solid black;
 }
 
-.versions{
+.versions {
   transition: transform 0.3s ease;
 }
 
-.activeVersion{
+.activeVersion {
   transform: translateY(-2px);
-  text-decoration: underline; 
+  text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.versions:hover{
+.versions:hover {
   cursor: pointer;
   color: #555555;
 }
 
-.options{
+.options {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -50,37 +50,37 @@
   padding: 1rem;
 }
 
-.pages{
+.pages {
   width: fit-content;
   transition: transform 0.3s ease;
 }
 
-.active{
+.active {
   text-decoration: underline;
   text-underline-offset: 5px;
   transform: translateY(-4px);
 }
 
-.page{
+.page {
   padding: 1rem;
   min-height: calc(100vh - 6rem - 4px - 5px);
 }
 
-.pages:hover{
+.pages:hover {
   cursor: pointer;
   color: #555555;
 }
 
-.plus:hover{
+.plus:hover {
   cursor: pointer;
   color: #555555;
 }
 
-.cke{
+.cke {
   border-bottom: 1px solid black;
 }
 
-.buttons{
+.buttons {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -88,18 +88,18 @@
   padding: 1rem;
 }
 
-.buttons button{
+.buttons button {
   margin-left: 1rem;
 }
 
-.saveIco{
+.saveIco {
   width: 1rem;
 }
 
-.black{
+.black {
   color: black;
 }
 
-.blue{
+.blue {
   color: blue;
 }

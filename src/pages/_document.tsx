@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en" style={{ minHeight: "100vh" }}>
       <Head />
       <body style={{ margin: 0, minHeight: "100vh" }}>
-        <Main/>
+        <Main />
         <NextScript />
       </body>
     </Html>

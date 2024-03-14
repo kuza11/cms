@@ -6,15 +6,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   if (req.method !== "POST") return res.status(405).json(null);
   if (req.body.key !== api.key) return res.status(401).json(null);
   try {
-    const num = await prisma.pages.findFirst({
-      select: {
-        pageNum: true
-      },
-      orderBy: {
-        pageNum: "desc"
-      }
-    }).then(res => res?.pageNum ?? null)
-    if(!num) return res.status(404).json(null)
+    const num = await prisma.pages
+      .findFirst({
+        select: {
+          pageNum: true,
+        },
+        orderBy: {
+          pageNum: "desc",
+        },
+      })
+      .then((res: { pageNum: number } | null) => res?.pageNum ?? null);
+    if (!num) return res.status(404).json(null);
     await prisma.pages.create({
       data: {
         pageNum: num + 1,
@@ -23,7 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
   } catch (error) {
     console.log(error);
+    prisma.$disconnect();
     return res.status(500).json({ message: "error" });
   }
+  prisma.$disconnect();
   res.status(200).json({ message: "ok" });
 }

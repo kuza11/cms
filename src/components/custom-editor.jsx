@@ -52,18 +52,10 @@ const editorConfiguration = {
   onReady: (editor: Editor) => void;
 }*/
 
-const CustomEditor = ({ initialData, onChange,  onReady}) => {
-
-
+const CustomEditor = ({ initialData, onChange, onReady }) => {
   return (
     <div>
-      <CKEditor
-        editor={Editor}
-        data={initialData}
-        config={editorConfiguration}
-        onChange={onChange}
-        onReady={onReady}
-      />
+      <CKEditor editor={Editor} data={initialData} config={editorConfiguration} onChange={onChange} onReady={onReady} />
     </div>
   );
 };

@@ -3,22 +3,29 @@ import prisma from "@/server/db";
 import api from "../../../api.json";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<{ message: string } | null>) {
-  if (req.method !== "POST") return res.status(405).json(null);
-  if (req.body.key !== api.key) return res.status(401).json(null);
+  if (req.method !== "POST") {
+    prisma.$disconnect();
+    return res.status(405).json(null);
+  }
+  if (req.body.key !== api.key) {
+    prisma.$disconnect();
+    return res.status(401).json(null);
+  }
   let id: number | null = null;
   let num: number | null = null;
   if (req.body.num) {
     num = +req.body.num;
+    prisma.$disconnect();
     if (isNaN(num)) return res.status(400).json(null);
   }
   if (req.body.id) {
     id = +req.body.id;
+    prisma.$disconnect();
     if (isNaN(id)) return res.status(400).json(null);
   }
   if (id) {
-
     try {
-        console.log(id);
+      console.log(id);
       prisma.pages.delete({
         where: {
           id: 58,
@@ -26,6 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       });
     } catch (error) {
       console.log(error);
+      prisma.$disconnect();
       return res.status(500).json({ message: "error" });
     }
     res.status(200).json({ message: "ok" });
@@ -39,8 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       });
     } catch (error) {
       console.log(error);
+      prisma.$disconnect();
       return res.status(500).json({ message: "error" });
     }
     res.status(200).json({ message: "ok" });
+    prisma.$disconnect();
   }
 }

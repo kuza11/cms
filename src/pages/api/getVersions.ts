@@ -12,11 +12,23 @@ export interface VersionsData
   }> {}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<VersionsData | null>) {
-  if (req.method !== "POST") return res.status(405).json(null);
-  if (req.body.key !== api.key) return res.status(401).json(null);
-  if (!req.query.num) return res.status(404).json(null);
+  if (req.method !== "POST") {
+    prisma.$disconnect();
+    return res.status(405).json(null);
+  }
+  if (req.body.key !== api.key) {
+    prisma.$disconnect();
+    return res.status(401).json(null);
+  }
+  if (!req.query.num) {
+    prisma.$disconnect();
+    return res.status(404).json(null);
+  }
   let num: number = +req.query.num;
-  if (isNaN(num)) return res.status(400).json(null);
+  if (isNaN(num)) {
+    prisma.$disconnect();
+    return res.status(400).json(null);
+  }
   const getVersions: VersionsData | null = await prisma.pages.findMany({
     where: {
       pageNum: num,
@@ -33,4 +45,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     },
   });
   res.status(200).json(getVersions);
+  prisma.$disconnect();
 }

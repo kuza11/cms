@@ -5,8 +5,14 @@ import api from "../../../api.json";
 export interface NumsNamesData extends Array<{ pageNum: number; name: string; id: number; hidden: boolean }> {}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<NumsNamesData | null>) {
-  if (req.method !== "POST") return res.status(405).json(null);
-  if (req.body.key !== api.key) return res.status(401).json(null);
+  if (req.method !== "POST") {
+    prisma.$disconnect();
+    return res.status(405).json(null);
+  }
+  if (req.body.key !== api.key) {
+    prisma.$disconnect();
+    return res.status(401).json(null);
+  }
   const edit: boolean = req.body.edit ? req.body.edit : false;
   const getNames: NumsNamesData | null = edit
     ? await prisma.pages.findMany({
@@ -60,9 +66,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       });
       if (getNamesEdited.length == getNames.length) {
         res.status(200).json(getNamesEdited.sort((a, b) => a.pageNum - b.pageNum));
+        prisma.$disconnect();
       }
     });
   } else {
     res.status(200).json(getNames);
+    prisma.$disconnect();
   }
 }
