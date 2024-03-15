@@ -80,6 +80,7 @@ function Index() {
     setPageVersion(pageVersions ? pageVersions[0].pageVersion : null);
   }
   if (pageHidden == null && page) {
+    console.log(page.hidden, page.pageVersion)
     setPageHidden(page.hidden);
   }
 
@@ -165,6 +166,9 @@ function Index() {
         mutate(`/api/getNumsNames`);
         mutate(`/api/getVersions?num=${pageNum}`);
         mutate(`/api/getPage?num=${pageNum}&version=${pageVersion}`);
+        pageVersions?.forEach((e)=>{
+          mutate(`/api/getPage?num=${pageNum}&version=${e.pageVersion}`);
+        })
         setPageHidden(!pageHidden);
       }
     });
@@ -291,7 +295,7 @@ function Index() {
       </div>
       {page ? (
         <div className={styles.options}>
-          <button onClick={changeStataus}>{pageHidden ? "Zobrazit" : "Skrýt"}</button>
+          <button onClick={changeStataus}>{pageVersions?.find((e) => e.pageVersion == pageVersion)?.hidden   ? "Zobrazit" : "Skrýt"}</button>
           <button onClick={deleteVersion}>Smazat Verzi</button>
           <button onClick={deletePage}>Smazat Stránku</button>
           <div>
