@@ -378,7 +378,7 @@ function Index() {
       >
         <label>Heslo:</label>
         <input type="password" ref={passwordRef} />
-        <button onClick={login}>Login</button>
+        <button onClick={login}>Přihlásit se</button>
       </div>
     </>
   );
