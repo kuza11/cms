@@ -80,7 +80,6 @@ function Index() {
     setPageVersion(pageVersions ? pageVersions[0].pageVersion : null);
   }
   if (pageHidden == null && page) {
-    console.log(page.hidden, page.pageVersion)
     setPageHidden(page.hidden);
   }
 
