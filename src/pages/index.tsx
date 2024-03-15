@@ -31,8 +31,12 @@ export function getStaticProps() {
 function Index({ ckStyles }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [pageNum, setPageNum] = useState(1);
 
-  const { data: page, error: pageError } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
+  const { data: page, error: pageError, isLoading: pageLoading } = useSWR<PageData>(`/api/getPage?num=${pageNum}`, fetcher);
   const { data: numsNames, error: numsNamesError } = useSWR<NumsNamesData>("/api/getNumsNames", fetcher);
+  
+  if(!page && !pageLoading) {
+    setPageNum(pageNum+1);
+  }
 
   return (
     <>
